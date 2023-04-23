@@ -1,7 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
+import globalLoadingReducer from '../features/globalLoadingSlice';
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    globalLoading: globalLoadingReducer,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
