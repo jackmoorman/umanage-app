@@ -1,16 +1,5 @@
 import { useDispatch } from 'react-redux';
-
-interface ValidateNewUser {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  q1: string;
-  q2: string;
-  q3: string;
-  answerOne: string;
-  answerTwo: string;
-  answerThree: string;
-}
+import { globalLoadingState } from '../features/globalLoadingSlice';
 
 export default function validateNewUser({
   email,
@@ -23,6 +12,8 @@ export default function validateNewUser({
   answerTwo,
   answerThree,
 }: ValidateNewUser) {
+  const dispatch = useDispatch();
+
   if (
     !email ||
     !password ||
@@ -33,8 +24,13 @@ export default function validateNewUser({
     !answerOne ||
     !answerTwo ||
     !answerThree
-  )
+  ) {
+    dispatch(globalLoadingState());
     return alert('All required fields must be filled out');
+  }
 
-  if (password !== confirmPassword) return alert('Passwords do not match');
+  if (password !== confirmPassword) {
+    dispatch(globalLoadingState());
+    return alert('Passwords do not match');
+  }
 }
