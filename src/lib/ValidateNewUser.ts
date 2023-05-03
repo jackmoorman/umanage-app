@@ -1,8 +1,5 @@
-import { useDispatch } from 'react-redux';
-import { globalLoadingState } from '../features/globalLoadingSlice';
-
 export default function validateNewUser({
-  email,
+  username,
   password,
   confirmPassword,
   q1,
@@ -11,11 +8,9 @@ export default function validateNewUser({
   answerOne,
   answerTwo,
   answerThree,
-}: ValidateNewUser) {
-  const dispatch = useDispatch();
-
+}: ValidateNewUser): boolean {
   if (
-    !email ||
+    !username ||
     !password ||
     !confirmPassword ||
     !q1 ||
@@ -25,12 +20,22 @@ export default function validateNewUser({
     !answerTwo ||
     !answerThree
   ) {
-    dispatch(globalLoadingState());
-    return alert('All required fields must be filled out');
+    console.log("Something doesn't exist");
+    alert('All required fields must be filled out');
+    return false;
   }
 
   if (password !== confirmPassword) {
-    dispatch(globalLoadingState());
-    return alert('Passwords do not match');
+    console.log("passwords don't match");
+    alert('Passwords do not match');
+    return false;
   }
+
+  if (username.length < 8 || password.length < 8) {
+    console.log('username or password is too short');
+    alert('Username & password must be at least 8 characters');
+    return false;
+  }
+
+  return true;
 }

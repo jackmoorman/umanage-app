@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ValidateNewUser {
-  email: string;
+  username: string;
   password: string;
   confirmPassword: string;
   q1: string;

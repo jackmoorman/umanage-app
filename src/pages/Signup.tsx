@@ -1,4 +1,5 @@
 import React from 'react';
+import Loading from '../components/Loading';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -6,16 +7,17 @@ import SecurityQuestion from '../components/SecurityQuestion';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../app/store';
 import { globalLoadingState } from '../features/globalLoadingSlice';
+import validateNewUser from '../lib/ValidateNewUser';
 
 export default function Signup() {
-  const [email, setEmail] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
-  const [q1, setQ1] = useState('What was the name of your first pet?');
-  const [q2, setQ2] = useState("What is your mother's maiden name?");
-  const [q3, setQ3] = useState("What is your father's middle name?");
+  const [q1, setQ1] = useState<string>('What was the name of your first pet?');
+  const [q2, setQ2] = useState<string>("What is your mother's maiden name?");
+  const [q3, setQ3] = useState<string>("What is your father's middle name?");
   const [answerOne, setAnswerOne] = useState<string>('');
   const [answerTwo, setAnswerTwo] = useState<string>('');
   const [answerThree, setAnswerThree] = useState<string>('');
@@ -28,27 +30,30 @@ export default function Signup() {
   async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    console.log(
-      email,
-      password,
-      confirmPassword,
-      firstName,
-      lastName,
-      q1,
-      answerOne,
-      q2,
-      answerTwo,
-      q3,
-      answerThree
-    );
-
     dispatch(globalLoadingState());
+
+    if (
+      !validateNewUser({
+        username,
+        password,
+        confirmPassword,
+        q1,
+        q2,
+        q3,
+        answerOne,
+        answerTwo,
+        answerThree,
+      })
+    ) {
+      dispatch(globalLoadingState());
+      return;
+    }
 
     const createdUser = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email,
+        username,
         password,
         firstName,
         lastName,
@@ -71,9 +76,7 @@ export default function Signup() {
   return (
     <>
       {globalLoading ? (
-        <main className="flex justify-center mt-10">
-          <h1 className="text-4xl">Loading...</h1>
-        </main>
+        <Loading />
       ) : (
         <main className="bg-slate-300 min-h-screen w-full flex justify-center">
           <form
@@ -84,25 +87,27 @@ export default function Signup() {
               <span className=" text-red-600 text-lg">*</span> : Required Field
             </p>
             <label htmlFor="email">
-              <span className=" text-red-600 text-lg">*</span> Email:
+              <span className=" text-red-600 text-lg">*</span> Username (All
+              Lowercase):
             </label>
             <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               type="text"
               id="email"
-              placeholder="Ex: johndoe@gmail.com"
+              placeholder="username"
               className="p-2"
             />
             <label htmlFor="password" className="mt-6">
-              <span className=" text-red-600 text-lg">*</span> Password:
+              <span className=" text-red-600 text-lg">*</span> Password
+              (Case-Sensitive):
             </label>
             <input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
               id="password"
-              placeholder="mypassword"
+              placeholder="myPassword"
               className="p-2"
             />
             <label htmlFor="confirm-password" className="mt-6">
@@ -113,7 +118,7 @@ export default function Signup() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               type="password"
               id="confirm-password"
-              placeholder="mypassword"
+              placeholder="myPassword"
               className="p-2"
             />
             <label htmlFor="first-name" className="mt-6">
